@@ -17,10 +17,19 @@ async function run() {
     try{
         await client.connect()
         const productCollection = client.db('groceryWarehouse').collection('products')
+        const userCollection = client.db('groceryWarehouse').collection('user')
 
         app.get('/product', async (req, res) => {
             const query = {}
+            const cursor = productCollection.find(query)
+            const products = await cursor.toArray()
+            res.send(products)
+        })
 
+        
+        app.get('/userProduct', async (req, res) => {
+            const email = req.query.email
+            const query = {email: email}
             const cursor = productCollection.find(query)
             const products = await cursor.toArray()
             res.send(products)
@@ -78,8 +87,19 @@ async function run() {
           const newProduct = req.body
           console.log(newProduct);
           const result = await productCollection.insertOne(newProduct)
+          console.log(result);
           res.send(result)
         })
+
+
+        
+        app.post('/userProduct', async (req, res) => {
+          const newProduct = req.body
+          console.log(newProduct);
+          const result = await userCollection.insertOne(newProduct)
+          res.send(result)
+        })
+        
 
     }
     finally{
