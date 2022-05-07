@@ -2,12 +2,14 @@ const express = require('express')
 const app = express()
 const port = process.env.PORT || 5000
 const cors = require('cors');
+const jwt = require('jsonwebtoken');
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('dotenv').config()
 
 // Middleware
 app.use(express.json())
 app.use(cors())
+
 
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.39pjl.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
@@ -19,6 +21,14 @@ async function run() {
         const productCollection = client.db('groceryWarehouse').collection('products')
         const userCollection = client.db('groceryWarehouse').collection('user')
 
+        // JWT
+        /*
+        app.post('/login', (req, res) => {
+          const email = req.body
+          var token = jwt.sign({ email }, process.env.ACCESS_TOKEN);
+          res.send({token})
+        })
+*/
         app.get('/product', async (req, res) => {
             const query = {}
             const cursor = productCollection.find(query)
@@ -30,7 +40,7 @@ async function run() {
         app.get('/userProduct', async (req, res) => {
             const email = req.query.email
             const query = {email: email}
-            const cursor = productCollection.find(query)
+            const cursor = userCollection.find(query)
             const products = await cursor.toArray()
             res.send(products)
         })
@@ -39,6 +49,13 @@ async function run() {
             const id = req.params.id
             const query = {_id: ObjectId(id)}
             const product = await productCollection.findOne(query)
+            res.send(product)
+        })
+
+        app.get('/userProduct/:id', async (req, res) => {
+            const id = req.params.id
+            const query = {_id: ObjectId(id)}
+            const product = await userCollection.findOne(query)
             res.send(product)
         })
 
@@ -82,20 +99,37 @@ async function run() {
           res.send(result)
         })
 
-        // Add Product
-        app.post('/product', async (req, res) => {
-          const newProduct = req.body
-          console.log(newProduct);
-          const result = await productCollection.insertOne(newProduct)
-          console.log(result);
+        app.delete('/userProduct/:id', async (req, res) => {
+          const id = req.params.id
+          const query = {_id: ObjectId(id)}
+          console.log(query);
+          const result = await userCollection.deleteOne(query)
           res.send(result)
         })
 
+        // Add Product
+        app.post('/product', async (req, res) => {
+          const newProduct = req.body
+          const result = await productCollection.insertOne(newProduct)
+          res.send(result)
+          //const tokenInfo = req.headers.authoraization
+          //console.log(tokenInfo);
+          //const [email, accessToken] = tokenInfo.split(" ")
+          //const decoded = verifyToken(accessToken);
+          //console.log(email);
+          //console.log(decoded, decoded.email);
+          //if(email === decoded.email) {
+            //const result = await productCollection.insertOne(newProduct)
+            //res.send({success: 'Product update succesfully'})
+            //console.log('Product update succesfully');
+          //} else{
+            //res.send({success: 'Unauthoraized Access'})
+            //console.log('Unauthoraized Access');
+          //}
+        })
 
-        
         app.post('/userProduct', async (req, res) => {
           const newProduct = req.body
-          console.log(newProduct);
           const result = await userCollection.insertOne(newProduct)
           res.send(result)
         })
@@ -117,3 +151,19 @@ app.get('/', (req, res) => {
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 })
+
+// verify token function
+/*
+function verifyToken(token) {
+  let email;
+  jwt.verify(token, process.env.ACCESS_TOKEN, function(err, decoded) {
+    if(err) {
+      email = "Invalid Email"
+    } 
+    if(decoded) {
+      console.log(decoded);
+      email = decoded
+    }
+  });
+  return email
+}*/
