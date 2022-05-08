@@ -22,13 +22,13 @@ async function run() {
         const userCollection = client.db('groceryWarehouse').collection('user')
 
         // JWT
-        /*
+      
         app.post('/login', (req, res) => {
           const email = req.body
           var token = jwt.sign({ email }, process.env.ACCESS_TOKEN);
           res.send({token})
         })
-*/
+
         app.get('/product', async (req, res) => {
             const query = {}
             const cursor = productCollection.find(query)
