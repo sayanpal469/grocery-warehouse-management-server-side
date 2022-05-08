@@ -111,24 +111,37 @@ async function run() {
         app.post('/product', async (req, res) => {
           const newProduct = req.body
           const tokenInfo = req.headers.authoraization
-          console.log(tokenInfo);
+          //console.log(tokenInfo);
           const [email, accessToken] = tokenInfo.split(" ")
-          const decoded = verifyToken(accessToken);
-          console.log(email, decoded.email);
-          if(email === decoded.email) {
+          //console.log(accessToken);
+          const decoded = verifyToken(accessToken)
+          //console.log(email, decoded.email);
+          if(email === decoded.email?.email) {
             const result = await productCollection.insertOne(newProduct)
             res.send(result)
             console.log('Product update succesfully');
           } else{
             res.send({success: 'Unauthoraized Access'})
-            console.log('Unauthoraized Access');
+            //console.log('Unauthoraized Access');
           }
         })
 
          app.post('/userProduct', async (req, res) => {
           const newProduct = req.body
-          const result = await userCollection.insertOne(newProduct)
-          res.send(result)
+          const tokenInfo = req.headers.authoraization
+          //console.log(tokenInfo);
+          const [email, accessToken] = tokenInfo.split(" ")
+          //console.log(accessToken);
+          const decoded = verifyToken(accessToken)
+          //console.log(email, decoded.email);
+          if(email === decoded.email?.email) {
+            const result = await userCollection.insertOne(newProduct)
+            res.send(result)
+            console.log('Product update succesfully');
+          } else{
+            res.send({success: 'Unauthoraized Access'})
+            //console.log('Unauthoraized Access');
+          }
         })
         
 
@@ -162,5 +175,6 @@ function verifyToken(token) {
       email = decoded
     }
   });
+
   return email
 }
