@@ -110,25 +110,22 @@ async function run() {
         // Add Product
         app.post('/product', async (req, res) => {
           const newProduct = req.body
-          const result = await productCollection.insertOne(newProduct)
-          res.send(result)
-          //const tokenInfo = req.headers.authoraization
-          //console.log(tokenInfo);
-          //const [email, accessToken] = tokenInfo.split(" ")
-          //const decoded = verifyToken(accessToken);
-          //console.log(email);
-          //console.log(decoded, decoded.email);
-          //if(email === decoded.email) {
-            //const result = await productCollection.insertOne(newProduct)
-            //res.send({success: 'Product update succesfully'})
-            //console.log('Product update succesfully');
-          //} else{
-            //res.send({success: 'Unauthoraized Access'})
-            //console.log('Unauthoraized Access');
-          //}
+          const tokenInfo = req.headers.authoraization
+          console.log(tokenInfo);
+          const [email, accessToken] = tokenInfo.split(" ")
+          const decoded = verifyToken(accessToken);
+          console.log(email, decoded.email);
+          if(email === decoded.email) {
+            const result = await productCollection.insertOne(newProduct)
+            res.send(result)
+            console.log('Product update succesfully');
+          } else{
+            res.send({success: 'Unauthoraized Access'})
+            console.log('Unauthoraized Access');
+          }
         })
 
-        app.post('/userProduct', async (req, res) => {
+         app.post('/userProduct', async (req, res) => {
           const newProduct = req.body
           const result = await userCollection.insertOne(newProduct)
           res.send(result)
@@ -153,7 +150,7 @@ app.listen(port, () => {
 })
 
 // verify token function
-/*
+
 function verifyToken(token) {
   let email;
   jwt.verify(token, process.env.ACCESS_TOKEN, function(err, decoded) {
@@ -166,4 +163,4 @@ function verifyToken(token) {
     }
   });
   return email
-}*/
+}
