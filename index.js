@@ -118,7 +118,7 @@ async function run() {
             res.send(result)
             console.log('Product update succesfully');
           } else{
-            res.send({success: 'Unauthoraized Access'})
+            res.send({err: 'Unauthoraized Access'})
             
           }
         })
@@ -133,7 +133,7 @@ async function run() {
             res.send(result)
             console.log('Product update succesfully');
           } else{
-            res.send({success: 'Unauthoraized Access'})
+            res.send({err: 'Unauthoraized Access'})
           }
         })
         
